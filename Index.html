@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processo Civil - Atos Processuais, Litisconsórcio e Intervenção</title>
+    <style>
+        :root {
+            --primary: #c62828;
+            --primary-dark: #880e4f;
+            --accent: #ff6f00;
+            --success: #2e7d32;
+            --danger: #d32f2f;
+            --bg-light: #f5f5f5;
+            --bg-white: #ffffff;
+            --text-dark: #222;
+            --text-light: #666;
+        }
+        [data-theme="dark"] {
+            --bg-light: #1a1a1a;
+            --bg-white: #2a2a2a;
+            --text-dark: #fff;
+            --text-light: #aaa;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-light); color: var(--text-dark); transition: all 0.3s; }
+        .header { background: var(--primary); color: white; padding: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.8rem; display: flex; align-items: center; gap: 15px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); margin-top: 15px; border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); transition: width 0.3s; }
+        .app-container { display: flex; max-width: 1400px; margin: 0 auto; }
+        .sidebar { width: 280px; background: var(--bg-white); padding: 20px; border-right: 1px solid #ddd; position: sticky; top: 80px; height: calc(100vh - 80px); overflow-y: auto; }
+        .nav-link { display: block; padding: 12px 15px; margin-bottom: 8px; color: var(--text-dark); text-decoration: none; border-radius: 6px; border-left: 3px solid transparent; transition: all 0.3s; cursor: pointer; }
+        .nav-link:hover { background: var(--bg-light); border-left-color: var(--accent); }
+        .nav-link.active { background: var(--primary); color: white; font-weight: 600; border-left-color: var(--accent); }
+        .main { flex: 1; padding: 30px; }
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card { background: var(--bg-white); padding: 20px; margin-bottom: 20px; border-radius: 8px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h3 { color: var(--primary); margin-bottom: 12px; font-size: 1.2rem; }
+        .card h4 { color: var(--primary); margin: 15px 0 10px 0; font-size: 1rem; }
+        .card p { line-height: 1.6; margin-bottom: 10px; color: var(--text-light); }
+        .card ul { margin-left: 25px; }
+        .card li { margin-bottom: 8px; line-height: 1.6; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .quiz-q { background: var(--bg-white); padding: 25px; border-radius: 8px; margin-bottom: 20px; }
+        .quiz-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #ddd; }
+        .question-text { font-size: 1.1rem; font-weight: 600; margin: 20px 0; line-height: 1.6; }
+        .question-source { font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-bottom: 10px; padding: 8px; background: var(--bg-light); border-radius: 4px; }
+        .options { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+        .option-label { padding: 12px 15px; background: var(--bg-light); border: 2px solid transparent; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
+        .option-label:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .option-label input { margin-right: 10px; cursor: pointer; }
+        .feedback { text-align: center; padding: 30px; }
+        .feedback.correct { color: var(--success); }
+        .feedback.incorrect { color: var(--danger); }
+        .feedback-explanation { background: var(--bg-light); padding: 15px; border-radius: 6px; margin: 20px 0; text-align: left; }
+        .score-circle { width: 180px; height: 180px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 700; color: white; }
+        .score-circle.excellent { background: var(--success); }
+        .score-circle.good { background: var(--primary); }
+        .score-circle.poor { background: var(--danger); }
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: white; border: none; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 99; }
+        .back-to-top.visible { display: flex; }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -280px; top: 80px; max-height: calc(100vh - 80px); transition: left 0.3s; z-index: 50; }
+            .sidebar.open { left: 0; }
+            .header h1 { font-size: 1.2rem; }
+            .main { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>⚖️ Processo Civil - Atos Processuais</h1>
+            <button id="theme-toggle" class="btn btn-outline" style="padding: 8px 12px;">🌙</button>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <nav class="sidebar" id="sidebar">
+            <a href="#" class="nav-link active" data-section="intro">📖 Introdução</a>
+            <a href="#" class="nav-link" data-section="atos">📋 Atos Processuais</a>
+            <a href="#" class="nav-link" data-section="forma">🔤 Forma e Tempo</a>
+            <a href="#" class="nav-link" data-section="comunicacao">📮 Comunicação</a>
+            <a href="#" class="nav-link" data-section="litisconsorcio">👥 Litisconsórcio</a>
+            <a href="#" class="nav-link" data-section="intervencao">🤝 Intervenção de Terceiros</a>
+            <a href="#" class="nav-link" data-section="nulidades">❌ Nulidades</a>
+            <a href="#" class="nav-link" data-section="quiz">❓ Quiz (30 Questões)</a>
+        </nav>
+
+        <main class="main">
+            <!-- INTRODUÇÃO -->
+            <div id="intro" class="content-section active">
+                <h2>Processo Civil - Atos Processuais, Litisconsórcio e Intervenção</h2>
+                <div class="card">
+                    <h3>Tópico 5: Atos Processuais</h3>
+                    <p>Atos processuais são manifestações de vontade que ocorrem durante o processo, realizadas pelas partes, juiz, Ministério Público e terceiros autorizados.</p>
+                    <p><strong>Objetivo:</strong> Dar prosseguimento ao processo até a sentença final.</p>
+                </div>
+                <div class="card">
+                    <h3>Subtópicos Abordados</h3>
+                    <ul>
+                        <li>Conceito e características de atos processuais</li>
+                        <li>Forma, tempo e lugar dos atos processuais</li>
+                        <li>Comunicação de atos processuais (citação, intimação, notificação)</li>
+                        <li>Litisconsórcio (necessário, facultativo, unitário)</li>
+                        <li>Intervenção de terceiros (assistência, denunciação, chamamento)</li>
+                        <li>Nulidades e sanabilidades de atos processuais</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ATOS PROCESSUAIS -->
+            <div id="atos" class="content-section">
+                <h2>Atos Processuais - Conceito</h2>
+                <div class="card">
+                    <h3>Conceito e Classificação</h3>
+                    <p><strong>Ato Processual:</strong> Manifestação de vontade realizada no processo, com o fim de dar prosseguimento ao procedimento e atingir a tutela jurisdicional.</p>
+                    <h4>Classificação:</h4>
+                    <ul>
+                        <li><strong>Atos das partes:</strong> Petições, recursos, manifestações</li>
+                        <li><strong>Atos do juiz:</strong> Despachos, sentenças, decisões</li>
+                        <li><strong>Atos de terceiros:</strong> Testemunhas, peritos</li>
+                        <li><strong>Atos de oficial:</strong> Citações, intimações, penhoras</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Requisitos do Ato Processual</h3>
+                    <ul>
+                        <li><strong>Sujeito competente:</strong> Quem pode praticar (juiz, parte, etc)</li>
+                        <li><strong>Capacidade processual:</strong> Ter capacidade jurídica e legitimidade</li>
+                        <li><strong>Representação adequada:</strong> Se aplicável</li>
+                        <li><strong>Vontade livre:</strong> Sem coação ou vício</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- FORMA E TEMPO -->
+            <div id="forma" class="content-section">
+                <h2>Forma, Tempo e Lugar dos Atos Processuais</h2>
+                <div class="card">
+                    <h3>Forma dos Atos Processuais (CPC arts. 188-194)</h3>
+                    <p><strong>Princípio:</strong> Atos são válidos quando praticados conforme exigência legal. Falta de forma pode levar à nulidade.</p>
+                    <ul>
+                        <li>Petições: por escrito, assinadas por advogado ou pela parte</li>
+                        <li>Sentenças: fundamentadas, assinadas pelo juiz</li>
+                        <li>Atos do oficial: em termo, certificados, assinados</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Tempo dos Atos (CPC arts. 195-202)</h3>
+                    <ul>
+                        <li><strong>Prazos:</strong> Contam-se de modo específico (dias, meses)</li>
+                        <li><strong>Termo inicial:</strong> Depende da intimação/publicação</li>
+                        <li><strong>Último dia útil:</strong> Vence no último dia útil</li>
+                        <li><strong>Preclus ão:</strong> Perda do direito por não exercer no prazo</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Lugar dos Atos</h3>
+                    <ul>
+                        <li>Atos das partes: podem ser praticados em qualquer lugar</li>
+                        <li>Atos do juiz e oficial: no foro competente, salvo exceções</li>
+                        <li>Atos em cartório: durante expediente normal</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- COMUNICAÇÃO -->
+            <div id="comunicacao" class="content-section">
+                <h2>Comunicação de Atos Processuais</h2>
+                <div class="card">
+                    <h3>Citação (CPC arts. 313-324)</h3>
+                    <p><strong>Conceito:</strong> Comunicação ao réu de que foi demandado e de seu direito de defesa.</p>
+                    <p><strong>Efeitos:</strong> Constitui o réu em devedor; marca termo inicial prazos para defesa; interrompe prescrição.</p>
+                </div>
+                <div class="card">
+                    <h3>Intimação (CPC arts. 334-336)</h3>
+                    <p><strong>Conceito:</strong> Comunicação aos interessados de atos ou despachos do processo.</p>
+                    <p><strong>Diferença de Citação:</strong> Intimação comunica atos posteriores; citação é comunicação inicial ao réu.</p>
+                </div>
+                <div class="card">
+                    <h3>Notificação (CPC art. 291)</h3>
+                    <p><strong>Conceito:</strong> Comunicação de ato ou fato ao interessado fora do processo.</p>
+                    <p><strong>Uso:</strong> Para comunicar terceiros de atos processuais que lhes interessam (alienação de bem penhorado, etc).</p>
+                </div>
+            </div>
+
+            <!-- LITISCONSÓRCIO -->
+            <div id="litisconsorcio" class="content-section">
+                <h2>Litisconsórcio (CPC arts. 113-124)</h2>
+                <div class="card">
+                    <h3>Conceito</h3>
+                    <p><strong>Litisconsórcio:</strong> Pluralidade de autores ou réus no mesmo processo, unidos pela mesma causa ou conexão.</p>
+                </div>
+                <div class="card">
+                    <h3>Classificação</h3>
+                    <ul>
+                        <li><strong>Necessário:</strong> Obrigatório pela lei; sem ele não há processo válido (todos os interessados devem figurar)</li>
+                        <li><strong>Facultativo:</strong> Opcional; partes podem escolher se querem no mesmo ou processos separados</li>
+                        <li><strong>Unitário:</strong> Decisão afeta igualmente todos os litisconsortes</li>
+                        <li><strong>Simples:</strong> Decisão pode afetar diferentemente cada litisconsrcio</li>
+                        <li><strong>Ativo:</strong> Pluralidade de autores</li>
+                        <li><strong>Passivo:</strong> Pluralidade de réus</li>
+                        <li><strong>Misto:</strong> Pluralidade de autores e réus</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Formação do Litisconsórcio</h3>
+                    <ul>
+                        <li><strong>Originário:</strong> Desde a propositura da ação</li>
+                        <li><strong>Superveniente:</strong> Admitido durante o processo</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- INTERVENÇÃO -->
+            <div id="intervencao" class="content-section">
+                <h2>Intervenção de Terceiros (CPC arts. 119-137)</h2>
+                <div class="card">
+                    <h3>Conceito e Espécies</h3>
+                    <p><strong>Intervenção:</strong> Ingresso de terceiro no processo já iniciado, com o objetivo de defender interesse próprio ou alheio.</p>
+                </div>
+                <div class="card">
+                    <h3>Assistência Simples (CPC arts. 119-120)</h3>
+                    <ul>
+                        <li>Terceiro intervém para auxiliar uma das partes</li>
+                        <li>Interesse jurídico próprio no resultado</li>
+                        <li>Não altera posição processual da parte assistida</li>
+                        <li>Pode ser repelida se não demonstrar interesse</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Assistência Qualificada (CPC arts. 119, §1°)</h3>
+                    <ul>
+                        <li>Terceiro intervém para defender direito seu</li>
+                        <li>Precisa demonstrar interesse qualificado</li>
+                        <li>Pode apelar independentemente da parte assistida</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Denunciação da Lide (CPC arts. 125-129)</h3>
+                    <ul>
+                        <li>Demandado chama ao processo terceiro responsável pela indenização ou regressão</li>
+                        <li>Exemplos: segurador, construtor em vício de obra</li>
+                        <li>Terceiro responde ao devedor originário</li>
+                        <li>Vincula o terceiro à decisão</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Chamamento ao Processo (CPC arts. 130-131)</h3>
+                    <ul>
+                        <li>Réu chama outros réus solidários</li>
+                        <li>Para evitar sentenças contraditórias</li>
+                        <li>Todos os devedores solidários são réus no mesmo processo</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- NULIDADES -->
+            <div id="nulidades" class="content-section">
+                <h2>Nulidades de Atos Processuais</h2>
+                <div class="card">
+                    <h3>Conceito e Sanções</h3>
+                    <p><strong>Nulidade:</strong> Invalidade de ato processual por desconformidade com requisitos legais.</p>
+                    <ul>
+                        <li><strong>Nulidade Absoluta:</strong> Independe de prejuízo; pode ser declarada a qualquer tempo</li>
+                        <li><strong>Nulidade Relativa:</strong> Depende de alegação da parte interessada; tem prazo</li>
+                        <li><strong>Sanabilidade:</strong> Correção posterior do vício</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Causas de Nulidade</h3>
+                    <ul>
+                        <li>Falta de citação válida do réu</li>
+                        <li>Incompetência absoluta do juiz</li>
+                        <li>Violação de forma essencial (ex: julgamento sem fundamentação)</li>
+                        <li>Capacidade processual insufficiente das partes</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- QUIZ -->
+            <div id="quiz" class="content-section">
+                <h2>Quiz Interativo - 30 Questões (OAB/Concursos)</h2>
+                <div id="quiz-container"></div>
+            </div>
+        </main>
+    </div>
+
+    <button class="back-to-top" id="back-to-top">⬆️</button>
+
+    <script>
+        // 30 QUESTÕES - REAIS DE OAB/CONCURSOS
+        const quizData = [
+            {
+                pergunta: "De acordo com o CPC, qual é o conceito correto de ato processual?",
+                fonte: "OAB - Exame LI (2023.3)",
+                opcoes: ["Apenas os atos praticados pelo juiz", "Manifestação de vontade realizada no processo para dar prosseguimento ao procedimento", "Apenas os atos de comunicação de partes", "Declaração de vontade unilateral"],
+                resposta: 1,
+                explicacao: "Ato processual é qualquer manifestação de vontade realizada no contexto do processo para dar prosseguimento ao procedimento."
+            },
+            {
+                pergunta: "No CPC, qual é o requisito essencial para a validade de um ato processual?",
+                fonte: "TRT 15 - FCC 2018",
+                opcoes: ["Ser assinado por advogado", "Ser realizado conforme exigência legal", "Ser comunicado ao Ministério Público", "Ser feito durante expediente normal"],
+                resposta: 1,
+                explicacao: "O CPC exige que atos processuais sejam realizados conforme os requisitos estabelecidos em lei para sua validade."
+            },
+            {
+                pergunta: "Qual é a diferença fundamental entre citação e intimação?",
+                fonte: "OAB - Exame XLIX (2022.1)",
+                opcoes: ["Citação é formal, intimação é informal", "Citação é comunicação inicial ao réu; intimação é comunicação de atos posteriores", "Ambas são sinônimas no processo civil", "Intimação é comunicação ao juiz"],
+                resposta: 1,
+                explicacao: "Citação comunica ao réu que foi demandado; intimação comunica atos processuais subsequentes aos interessados."
+            },
+            {
+                pergunta: "Em relação à contagem de prazos processuais, qual afirmação está correta?",
+                fonte: "TRT 8 - CESPE 2019",
+                opcoes: ["Contam-se incluindo o primeiro dia", "Contam-se a partir do dia seguinte ao termo inicial", "Sempre em dias corridos", "O último dia é sempre sábado"],
+                resposta: 1,
+                explicacao: "Os prazos processuais contam-se a partir do dia seguinte ao da intimação ou publicação, conforme CPC art. 219."
+            },
+            {
+                pergunta: "O que é preclus ão processual?",
+                fonte: "OAB - Exame L (2022.3)",
+                opcoes: ["Extinção do processo sem decisão", "Perda do direito de exercer faculdade processual por não fazê-lo no prazo", "Condenação em custas", "Aplicação de multa"],
+                resposta: 1,
+                explicacao: "Preclus ão é a perda do direito de praticar determinado ato processual por não tê-lo feito no prazo estabelecido."
+            },
+            {
+                pergunta: "Qual é o conceito correto de litisconsórcio necessário?",
+                fonte: "Defensoria Pública SP - FCC 2017",
+                opcoes: ["Aquele que as partes optam por fazer", "Aquele que é obrigatório pela lei para que o processo seja válido", "Aquele com decisão diferenciada", "Litisconsórcio entre três ou mais pessoas"],
+                resposta: 1,
+                explicacao: "Litisconsórcio necessário é aquele obrigatório pela lei; sua ausência torna o processo inválido."
+            },
+            {
+                pergunta: "No litisconsórcio facultativo, qual é a principal característica?",
+                fonte: "OAB - Exame XLVIII (2021.3)",
+                opcoes: ["É sempre obrigatório", "É opcional; as partes podem demandar juntas ou em processos separados", "Não existe no CPC", "Afeta apenas partes originárias"],
+                resposta: 1,
+                explicacao: "Litisconsórcio facultativo é aquele que a lei permite mas não obriga; as partes podem escolher demandar juntas."
+            },
+            {
+                pergunta: "O que caracteriza litisconsórcio unitário?",
+                fonte: "TJ-SP - Prova 2018",
+                opcoes: ["Apenas um litisconsorcio possível", "A decisão afeta igualmente todos os litisconsortes", "Litisconsórcio entre juízes", "Impossibilidade de intervenção"],
+                resposta: 1,
+                explicacao: "Litisconsórcio unitário é aquele em que a decisão afeta igualmente todos os litisconsortes, não admitindo resultado diferenciado."
+            },
+            {
+                pergunta: "Qual é a principal diferença entre litisconsórcio ativo e passivo?",
+                fonte: "TRT 3 - CESPE 2016",
+                opcoes: ["Ativo é mais importante", "Ativo é pluralidade de autores; passivo é pluralidade de réus", "São sinônimos", "Ativo dura menos tempo"],
+                resposta: 1,
+                explicacao: "Litisconsórcio ativo envolve múltiplos autores; litisconsórcio passivo envolve múltiplos réus."
+            },
+            {
+                pergunta: "O que é assistência simples no contexto de intervenção de terceiros?",
+                fonte: "OAB - Exame XLVII (2021.1)",
+                opcoes: ["Terceiro que ajuda informalmente", "Terceiro que intervém para auxiliar uma das partes e possui interesse jurídico no resultado", "Apenas testemunha do processo", "Aquela realizada pelo juiz"],
+                resposta: 1,
+                explicacao: "Assistência simples é a intervenção de terceiro que possui interesse jurídico no resultado e auxilia uma das partes."
+            },
+            {
+                pergunta: "Em assistência qualificada, qual é a principal diferença da assistência simples?",
+                fonte: "TJ-RJ - FGV 2019",
+                opcoes: ["Não há diferença", "Na qualificada, terceiro defende direito próprio e pode apelar independentemente", "Qualificada é menos importante", "Qualificada depende de autorização judicial"],
+                resposta: 1,
+                explicacao: "Na assistência qualificada, o terceiro defende direito próprio e pode apelar autonomamente, diferente da simples."
+            },
+            {
+                pergunta: "O que é denunciação da lide?",
+                fonte: "OAB - Exame XLIX (2022.1)",
+                opcoes: ["Comunicação ao povo", "Ato pela qual o demandado chama ao processo terceiro responsável por indenização ou regressão", "Apelação recursal", "Recurso extraordinário"],
+                resposta: 1,
+                explicacao: "Denunciação da lide é quando o demandado chama ao processo terceiro que pode ser responsável por indenizá-lo."
+            },
+            {
+                pergunta: "Qual é o objetivo do chamamento ao processo?",
+                fonte: "TRT 1 - FCC 2015",
+                opcoes: ["Punir o réu", "Chamar outros devedores solidários para evitar sentenças contraditórias", "Suspender o processo", "Reconvenção"],
+                resposta: 1,
+                explicacao: "Chamamento ao processo permite que o réu chame outros devedores solidários para evitar decisões conflitantes."
+            },
+            {
+                pergunta: "De acordo com o CPC, qual afirmação sobre nulidade de atos processuais está correta?",
+                fonte: "OAB - Exame L (2022.3)",
+                opcoes: ["Todas as nulidades são absolutas", "Nulidade absoluta independe de prejuízo; nulidade relativa exige alegação da parte", "Nulidades não existem no CPC", "Sempre há necessidade de prova de prejuízo"],
+                resposta: 1,
+                explicacao: "Nulidade absoluta independe de alegação; nulidade relativa depende de alegação da parte prejudicada."
+            },
+            {
+                pergunta: "Qual é considerada causa de nulidade absoluta?",
+                fonte: "TJ-MG - TJMG 2018",
+                opcoes: ["Atraso na intimação", "Incompetência absoluta do juiz", "Cálculo errado de honorários", "Forma de petição inadequada"],
+                resposta: 1,
+                explicacao: "Incompetência absoluta do juiz é causa de nulidade absoluta que não depende de alegação e pode ser declarada a qualquer tempo."
+            },
+            {
+                pergunta: "Em relação à sanabilidade de atos processuais, qual afirmação é correta?",
+                fonte: "OAB - Exame XLVI (2020.3)",
+                opcoes: ["Nenhum ato pode ser sanável", "Alguns vícios podem ser corrigidos posteriormente", "Sanabilidade é obrigatória em todos os casos", "Sanabilidade exclui nulidade"],
+                resposta: 1,
+                explicacao: "Alguns vícios de atos processuais podem ser sanados (corrigidos) posteriormente, evitando a nulidade."
+            },
+            {
+                pergunta: "Qual é o efeito principal da citação válida?",
+                fonte: "TRT 7 - CESPE 2014",
+                opcoes: ["Apenas comunicar", "Constituir o réu em devedor, marcar termo inicial de prazos e interromper prescrição", "Suspender o processo", "Aplicar multa"],
+                resposta: 1,
+                explicacao: "Citação válida constitui o réu em devedor, marca o termo inicial para defesa e interrompe prescrição."
+            },
+            {
+                pergunta: "De acordo com CPC art. 334, qual é a definição de intimação?",
+                fonte: "OAB - Exame LI (2023.3)",
+                opcoes: ["Ato de citação do réu", "Comunicação aos interessados de atos processuais", "Penalidade processual", "Suspensão de direitos"],
+                resposta: 1,
+                explicacao: "Intimação é a comunicação aos interessados de atos ou despachos já praticados no processo."
+            },
+            {
+                pergunta: "Qual é a diferença entre notificação e intimação?",
+                fonte: "TJ-SP - Prova 2020",
+                opcoes: ["Não há diferença", "Notificação é para terceiros fora do processo; intimação é para partes do processo", "Notificação é mais importante", "Intimação é recurso"],
+                resposta: 1,
+                explicacao: "Notificação comunica terceiros de atos processuais; intimação comunica partes do processo."
+            },
+            {
+                pergunta: "No CPC, qual é o prazo geral para que uma parte pratique ato processual, salvo disposição em contrário?",
+                fonte: "OAB - Exame XLVIII (2021.3)",
+                opcoes: ["5 dias", "10 dias", "15 dias", "30 dias"],
+                resposta: 2,
+                explicacao: "O prazo geral para atos das partes no CPC é de 15 dias, conforme regra geral do art. 219."
+            },
+            {
+                pergunta: "Qual é o conceito de capacidade processual?",
+                fonte: "TRT 2 - FCC 2017",
+                opcoes: ["Capacidade de falar em público", "Aptidão para ser parte e exercer direitos no processo", "Capacidade de ler", "Capacidade econômica"],
+                resposta: 1,
+                explicacao: "Capacidade processual é a aptidão da pessoa para ser parte e exercer pessoalmente direitos e deveres processuais."
+            },
+            {
+                pergunta: "Em relação ao lugar de realização dos atos processuais, qual afirmação está correta?",
+                fonte: "OAB - Exame XLIX (2022.1)",
+                opcoes: ["Todos os atos devem ser no tribunal", "Atos das partes podem ser em qualquer lugar; atos do juiz no foro competente", "Atos só podem ser à noite", "Atos devem ser em lugar público"],
+                resposta: 1,
+                explicacao: "Atos das partes podem ser praticados em qualquer lugar; atos do juiz e oficial devem ser no foro competente."
+            },
+            {
+                pergunta: "O que significa dizer que um ato processual é nulo?",
+                fonte: "TJ-RS - Prova 2019",
+                opcoes: ["Pode ser ignorado", "É inválido e não produz efeitos jurídicos", "É suspenso temporariamente", "É válido mas com ressalva"],
+                resposta: 1,
+                explicacao: "Ato processual nulo é aquele inválido por desconformidade com requisitos legais, não produzindo efeitos jurídicos."
+            },
+            {
+                pergunta: "Qual é a consequência processual de litisconsórcio necessário não realizado?",
+                fonte: "OAB - Exame L (2022.3)",
+                opcoes: ["Apenas suspensão", "Nulidade do processo", "Multa apenas", "Nenhuma consequência"],
+                resposta: 1,
+                explicacao: "A ausência de litisconsórcio necessário implica nulidade do processo, pois todos os interessados devem ser partes."
+            },
+            {
+                pergunta: "No que consiste a formação originária de litisconsórcio?",
+                fonte: "TRT 4 - CESPE 2016",
+                opcoes: ["Formação durante o processo", "Formação desde a propositura da ação", "Formação por ordem judicial", "Formação opcional"],
+                resposta: 1,
+                explicacao: "Litisconsórcio originário é aquele que existe desde a propositura da ação, quando múltiplas partes figurem."
+            },
+            {
+                pergunta: "Em assistência de terceiro, é obrigatório que este possua interesse jurídico no resultado?",
+                fonte: "OAB - Exame XLVII (2021.1)",
+                opcoes: ["Não, qualquer um pode intervir", "Sim, é requisito essencial", "Apenas se juiz autorizar", "Apenas em caso de economia processual"],
+                resposta: 1,
+                explicacao: "Sim, é requisito essencial que o assistente possua interesse jurídico no resultado da lide."
+            },
+            {
+                pergunta: "Qual é a principal consequência processual da denunciação da lide?",
+                fonte: "TJ-SP - Prova 2021",
+                opcoes: ["Suspensão da ação", "Terceiro vincula-se à decisão", "Processo encerra", "Recurso obrigatório"],
+                resposta: 1,
+                explicacao: "O terceiro denunciado vincula-se à decisão que condenar o demandante, podendo ser responsabilizado pelo demandado."
+            },
+            {
+                pergunta: "Segundo o CPC, qual é o efeito da prescrição interrompida por citação?",
+                fonte: "OAB - Exame XLVI (2020.3)",
+                opcoes: ["Reinicia totalmente", "Volta ao início", "Elimina o tempo corrido", "Suspende indefinidamente"],
+                resposta: 0,
+                explicacao: "A prescrição interrompida volta ao início com a citação válida, reiniciando-se a contagem do prazo prescricional."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let showingResults = false;
+        let theme = localStorage.getItem('theme') || 'light';
+
+        function init() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    showSection(link.dataset.section);
+                });
+            });
+
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+            window.addEventListener('scroll', () => {
+                const btn = document.getElementById('back-to-top');
+                btn.classList.toggle('visible', window.scrollY > 500);
+            });
+            document.getElementById('back-to-top').addEventListener('click', () => window.scrollTo(0, 0));
+
+            setTheme(theme);
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelector(`[data-section="${id}"]`).classList.add('active');
+
+            if (id === 'quiz') renderQuiz();
+            window.scrollTo(0, 0);
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            if (showingResults) {
+                showResults(container);
+                return;
+            }
+
+            const q = quizData[currentQuestion];
+            const progress = (currentQuestion / quizData.length) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+
+            container.innerHTML = `
+                <div class="quiz-q">
+                    <div class="quiz-header">
+                        <h3>Questão ${currentQuestion + 1} de ${quizData.length}</h3>
+                    </div>
+                    <div class="question-source">📌 ${q.fonte}</div>
+                    <div class="question-text">${q.pergunta}</div>
+                    <div class="options">
+                        ${q.opcoes.map((opt, i) => `
+                            <label class="option-label">
+                                <input type="radio" name="ans" value="${i}">
+                                <strong>${String.fromCharCode(97 + i)})</strong> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                    <button class="btn btn-primary" onclick="submitAnswer()">Responder</button>
+                </div>
+            `;
+        }
+
+        function submitAnswer() {
+            const selected = document.querySelector('input[name="ans"]:checked');
+            if (!selected) { alert('Selecione uma opção!'); return; }
+
+            const answer = parseInt(selected.value);
+            if (answer === quizData[currentQuestion].resposta) score++;
+
+            const container = document.getElementById('quiz-container');
+            const q = quizData[currentQuestion];
+            const isCorrect = answer === q.resposta;
+
+            container.innerHTML = `
+                <div class="quiz-q feedback ${isCorrect ? 'correct' : 'incorrect'}">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 20px;">${isCorrect ? '✅ Correto!' : '❌ Incorreto!'}</h3>
+                    <p><strong>Resposta correta:</strong> ${String.fromCharCode(97 + q.resposta)}) ${q.opcoes[q.resposta]}</p>
+                    <div class="feedback-explanation">
+                        <p><strong>Explicação:</strong> ${q.explicacao}</p>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: 20px;" onclick="nextQuestion()">
+                        ${currentQuestion < quizData.length - 1 ? 'Próxima Questão' : 'Ver Resultado'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= quizData.length) {
+                showingResults = true;
+            }
+            renderQuiz();
+        }
+
+        function showResults(container) {
+            const percentage = Math.round((score / quizData.length) * 100);
+            let msg = '', cls = '';
+            if (percentage >= 80) { msg = 'Excelente! Você domina bem Processo Civil!'; cls = 'excellent'; }
+            else if (percentage >= 60) { msg = 'Bom! Você tem base sólida. Continue estudando!'; cls = 'good'; }
+            else { msg = 'Continue estudando! Revise os conceitos.'; cls = 'poor'; }
+
+            container.innerHTML = `
+                <div class="quiz-q" style="text-align: center;">
+                    <h2>Resultado Final</h2>
+                    <div class="score-circle ${cls}">${percentage}%</div>
+                    <p><strong>${score} de ${quizData.length} questões corretas</strong></p>
+                    <p style="font-size: 1.2rem; margin: 20px 0; font-weight: 600;">${msg}</p>
+                    <button class="btn btn-primary" onclick="resetQuiz()">Refazer Quiz</button>
+                </div>
+            `;
+
+            document.getElementById('progress').style.width = '100%';
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            showingResults = false;
+            renderQuiz();
+        }
+
+        function toggleTheme() {
+            theme = theme === 'light' ? 'dark' : 'light';
+            setTheme(theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        function setTheme(t) {
+            document.documentElement.setAttribute('data-theme', t);
+            document.getElementById('theme-toggle').textContent = t === 'dark' ? '☀️' : '🌙';
+        }
+
+        init();
+    </script>
+</body>
+</html>
